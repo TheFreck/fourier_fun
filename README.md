@@ -1,1 +1,1 @@
-# fourier_fun
+# fourier_exploration
