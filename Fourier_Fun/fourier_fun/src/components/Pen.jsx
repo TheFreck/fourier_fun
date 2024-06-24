@@ -1,49 +1,35 @@
 import * as THREE from 'three';
 import { useFrame } from "@react-three/fiber";
-import { useRef, useState } from 'react';
-import { PenLine } from './PenLine';
+import { useEffect, useRef, useState } from 'react';
 
-export const Pen = ({color,thickness,rotatorRef,radius,isFinal}) => {
+export const Pen = ({radius,isFinal}) => {
     const penRef = useRef();
-    const lineRef = useRef();
     let globalPosition = new THREE.Vector3();
     const globalPositions = [];
-    const localPositions = [];
     let lineGeometry = new THREE.BufferGeometry();
     lineGeometry.setFromPoints(globalPositions);
-    const convertToLocal = (positions) => ({
-        x: Math.sin(rotatorRef.current.rotation.z),
-        y: Math.cos(rotatorRef.current.rotation.z),
-        z: 0
-    });
 
     useFrame((state,delta) => {
-        console.log("is pen final: ", isFinal);
-        penRef.current.rotation.z = -rotatorRef.current.rotation.z;
-        lineRef.current.position.x = Math.cos(rotatorRef.current.rotation.z+(3*Math.PI)/2);
-        lineRef.current.position.y = Math.sin(rotatorRef.current.rotation.z+(3*Math.PI)/2);
-        lineRef.current.rotation.z = (rotatorRef.current.rotation.z - (Math.PI));
-        globalPositions.unshift(new THREE.Vector3(-Math.sin(rotatorRef.current.rotation.z)*radius,-Math.cos(rotatorRef.current.rotation.z)*radius,0));
-        if(globalPositions.length >= 200) globalPositions.shift();
         if(isFinal){
-            lineGeometry.setFromPoints(globalPositions);
+            if(!state.globalPositions || state.globalPositions.length === 0) state.globalPositions = [];
+            globalPosition = new THREE.Vector3();
+            penRef.current.getWorldPosition(globalPosition);
+            globalPositions.push(globalPosition);
+            if(state.globalPositions.length >= 50) {
+                globalPositions.shift();
+                globalPositions.shift();
+                globalPositions.shift();
+            }
+            state.globalPositions.push(globalPosition);
         }
     });
 
     return <mesh 
+        position={[0,0,0]}
         ref={penRef} 
     >
-        {/* <sphereGeometry args={[.1,10,5]}/> */}
-        {/* <meshBasicMaterial wireframe color={"tan"} /> */}
-        {
-            <line
-
-                ref={lineRef}
-                geometry={lineGeometry}
-            >
-                <lineBasicMaterial side={THREE.DoubleSide} attach="material" color="green" linewidth={5} />
-            </line>
-        }
+        <sphereGeometry attach="geometry" args={[radius/50,10,5]}/>
+        <meshBasicMaterial visible={false} intensity={5} isLight={true} attach="material" wireframe color={"yellow"} />
     </mesh>;
 }
 

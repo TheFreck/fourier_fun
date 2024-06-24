@@ -1,43 +1,43 @@
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import * as THREE from 'three';
 import { Radius } from "./Radius";
 import { useFrame } from "@react-three/fiber";
-import { BackSide, DoubleSide, FrontSide } from "three";
+import { DoubleSide } from "three";
 import Pen from "./Pen";
 
 export const Rotator = (props) => {
-    const {radius,isFinal} = props;
-    const rotatorRef = useRef();
+    const {radius,isFinal,rotatorRef} = props;
     const couplingRef = useRef();
-    const [displayRadius, setDisplayRadius] = useState(false);
-    const [displayCircumference, setDisplayCircumference] = useState(false);
-    const [draw,setDraw] = useState(false);
     let globalRotatorPosition = new THREE.Vector3();
     let globalCouplingPosition = new THREE.Vector3();
 
+    useEffect(() => {
+        couplingRef.current.rotation.z = 3*Math.PI;
+    },[]);
+    
     useFrame((state,delta) => {
-        rotatorRef.current.rotation.z += delta;
-        couplingRef.current.position.y = Math.cos(couplingRef.current.rotation.z);
-        couplingRef.current.position.x = Math.sin(couplingRef.current.rotation.z);
-        couplingRef.current.getWorldPosition(globalCouplingPosition);
+        // rotatorRef.current.rotation.z += delta*2;
+        couplingRef.current.position.y = Math.cos(couplingRef.current.rotation.z)*radius;
+        couplingRef.current.position.x = Math.sin(couplingRef.current.rotation.z)*radius;
     })
 
     return <mesh 
         ref={rotatorRef}
-    >
+        receiveShadow
+        castShadow
+        >
         <mesh
             ref={couplingRef}
-            position={[0,0,0]}
         >
-            <Pen thickness={1} color="green" rotatorRef={rotatorRef} radius={radius} isFinal={isFinal} />
+            <Pen radius={radius} isFinal={isFinal} />
             {props.children}
         </mesh>
         <sphereGeometry 
-            args={[radius,36,36]}
+            args={[radius,1,1]}
             attach="geometry"
         />
-        <meshStandardMaterial side={DoubleSide} attach="material" color={"gray"} transparent opacity={.05} />
-        <Radius length={radius} color="red" thickness={5} />
+        <meshStandardMaterial side={DoubleSide} attach="material" color={"gray"} transparent opacity={0} />
+        <Radius length={radius} color="red" />
     </mesh>
 }
 
