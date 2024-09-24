@@ -15,15 +15,11 @@ export const Radius = ({length,color,thickness}) => {
         radiusRef.current.rotation.z = Math.PI;
     },[]);
     
-    // useFrame((state,delta) => {
-    //     radiusRef.current.getWorldPosition(globalPosition);
-    // });
-    
     return <line
         ref={radiusRef}
         geometry={lineGeometry}
     >
-        <lineBasicMaterial visible={false} attach="material" color={color} linewidth={thickness} />
+        <lineBasicMaterial visible={true} attach="material" color={color} linewidth={thickness} />
     </line>
 }
 

@@ -11,11 +11,11 @@ import Pen from './components/Pen';
 const App = () => {
     const [cameraX, setCameraX] = useState(0);
     const [cameraY, setCameraY] = useState(0);
-    const [cameraZ, setCameraZ] = useState(10);
+    const [cameraZ, setCameraZ] = useState(100);
     const [delta,setDelta] = useState(1);
 
     const fogColor = new THREE.Color("black");
-    const fog = new THREE.Fog(fogColor,.25,4);
+    const fog = new THREE.Fog(fogColor,.25,10000);
     
     return <div style={{ width: "100vw", height: "100vh" }}>
         <Canvas background={fogColor} fog={fog} camera={{ position: [cameraX, cameraY, cameraZ] }}>
